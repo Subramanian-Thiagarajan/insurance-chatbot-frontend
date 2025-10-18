@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { Upload, FileText, Loader2, X } from 'lucide-react';
+import { Upload, FileText, Loader2, X, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { listDocuments, uploadDocument } from '@/lib/actions';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -16,9 +16,52 @@ type Document = {
   id: string;
   size: number;
   upload_date: string;
+  is_embedded: boolean;
+  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
 };
 
 const MAX_FILE_SIZE_MB = Number(process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB || 50);
+
+// Status badge component
+const StatusBadge = ({ status, isEmbedded }: { status: Document['processing_status']; isEmbedded: boolean }) => {
+  if (status === 'completed' && isEmbedded) {
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        <span className="text-xs font-medium">Ready</span>
+      </div>
+    );
+  }
+  
+  if (status === 'processing') {
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <span className="text-xs font-medium">Processing</span>
+      </div>
+    );
+  }
+  
+  if (status === 'pending') {
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
+        <Clock className="h-3.5 w-3.5" />
+        <span className="text-xs font-medium">Pending</span>
+      </div>
+    );
+  }
+  
+  if (status === 'failed') {
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-700">
+        <AlertCircle className="h-3.5 w-3.5" />
+        <span className="text-xs font-medium">Failed</span>
+      </div>
+    );
+  }
+  
+  return null;
+};
 
 export default function AdminPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -139,10 +182,11 @@ export default function AdminPage() {
                     className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition"
                   >
                     <FileText className="h-5 w-5 text-gray-400" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{doc.filename}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{doc.filename}</p>
                       <p className="text-xs text-gray-500">{doc.upload_date}</p>
                     </div>
+                    <StatusBadge status={doc.processing_status} isEmbedded={doc.is_embedded} />
                   </div>
                 ))}
               </div>
