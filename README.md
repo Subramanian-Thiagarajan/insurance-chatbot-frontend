@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# frontend (Next.js)
 
-## Getting Started
+Executive summary
 
-First, run the development server:
+This directory contains a Next.js application that serves as the UI for the insurance-chatbot project. It provides pages and components to upload documents and view the document list by talking to the backend API.
 
-```bash
+## Technology stack
+
+- Next.js (React + TypeScript)
+- Tailwind / PostCSS (project includes postcss config)
+
+## Local development
+
+Install dependencies and run the dev server:
+
+```powershell
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser. The frontend expects the backend API to be available at `http://localhost:8000` (default). If you run the backend on another host/port, update any client-side `actions` or environment variables.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build & Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+cd frontend
+npm run build
+npm run start
+```
 
-## Learn More
+## Environment and configuration
 
-To learn more about Next.js, take a look at the following resources:
+- The frontend is a typical Next.js app; environment variables can be defined via `.env.local`. Example variables you may need:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- NEXT_PUBLIC_API_BASE_URL — base URL for backend API (default: http://localhost:8000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Mermaid diagram (frontend <> backend)
 
-## Deploy on Vercel
+```mermaid
+sequenceDiagram
+  participant UI as Next.js UI
+  participant API as Backend API
+  UI->>API: POST /api/documents/upload (file)
+  API-->>UI: 201 Created (metadata)
+  UI->>API: GET /api/documents
+  API-->>UI: 200 OK (list)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Change History
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2025-10-18 - v0.1.0 - FEATURE
+
+**Components Affected**: frontend
+**Summary**: Expanded frontend README with run/build instructions and diagram.
+
+---
+
+## Troubleshooting
+
+- If the frontend cannot reach the backend, ensure `NEXT_PUBLIC_API_BASE_URL` is set correctly and the backend is running on the expected port.
+
+## Contributing
+
+Please open pull requests for UI changes and update the Change History for significant updates.
